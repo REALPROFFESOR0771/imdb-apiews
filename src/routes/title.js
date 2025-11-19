@@ -7,6 +7,10 @@ export default async function title(req) {
   try {
     if (seasonId) {
       const result = await getSeason({ id, seasonId });
+
+      // safe handling
+      if (result?.error) return Response.json(result);
+
       return Response.json({
         id,
         title_api_path: `/title/${id}`,
@@ -18,14 +22,13 @@ export default async function title(req) {
 
     const result = await getTitle(id);
 
-    // If getTitle returned an error object → return 200 with error JSON
-    if (result?.error) {
-      return Response.json(result);
-    }
+    // safe handling
+    if (result?.error) return Response.json(result);
 
     return Response.json(result);
 
   } catch (error) {
+    // fallback (normally never reached)
     return Response.json(
       { error: true, message: error.message || "Unknown Worker Error" },
       { status: 200 }
